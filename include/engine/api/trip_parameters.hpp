@@ -47,7 +47,27 @@ namespace api
  */
 struct TripParameters : public RouteParameters
 {
-    // bool IsValid() const; Falls back to base class
+    TripParameters()
+        : RouteParameters(false,
+                          false,
+                          false,
+                          RouteParameters::GeometriesType::Polyline,
+                          RouteParameters::OverviewType::Simplified,
+                          {}),
+          source(-1), destination(-1)
+    {
+    }
+
+    template <typename... Args>
+    TripParameters(int source_, int destination_, Args &&... args_)
+        : RouteParameters{std::forward<Args>(args_)...}, source{source_}, destination{destination_}
+    {
+    }
+
+    int source;
+    int destination;
+
+    bool IsValid() const { return RouteParameters::IsValid() && source >= -1 && destination >= -1; }
 };
 }
 }
