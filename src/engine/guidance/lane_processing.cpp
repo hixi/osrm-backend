@@ -2,7 +2,7 @@
 #include "util/group_by.hpp"
 
 #include "extractor/guidance/turn_instruction.hpp"
-#include "engine/guidance/post_processing.hpp"
+#include "engine/guidance/collapsing_utility.hpp"
 
 #include <algorithm>
 #include <iterator>
@@ -177,15 +177,6 @@ std::vector<RouteStep> anticipateLaneChange(std::vector<RouteStep> steps,
                     anticipate_for_right_turn();
                 else // FIXME: right-sided driving
                     anticipate_for_right_turn();
-            }
-
-            // We might have constrained the previous step in a way that makes it compatible
-            // with the current step. If we did so we collapse it here and mark the current
-            // step as invalid, scheduled for later removal.
-            if (collapsable(previous, current))
-            {
-                previous.ElongateBy(current);
-                current.maneuver.instruction = TurnInstruction::NO_TURN();
             }
         });
     };
