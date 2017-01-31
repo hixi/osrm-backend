@@ -47,16 +47,7 @@ namespace api
  */
 struct TripParameters : public RouteParameters
 {
-    TripParameters()
-        : RouteParameters(false,
-                          false,
-                          false,
-                          RouteParameters::GeometriesType::Polyline,
-                          RouteParameters::OverviewType::Simplified,
-                          {}),
-          source(-1), destination(-1)
-    {
-    }
+    TripParameters() = default;
 
     template <typename... Args>
     TripParameters(int source_, int destination_, Args &&... args_)
@@ -64,8 +55,8 @@ struct TripParameters : public RouteParameters
     {
     }
 
-    int source;
-    int destination;
+    int source = -1;
+    int destination = -1;
 
     bool IsValid() const { return RouteParameters::IsValid() && source >= -1 && destination >= -1; }
 };

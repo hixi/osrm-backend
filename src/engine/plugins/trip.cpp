@@ -176,14 +176,6 @@ Status TripPlugin::HandleRequest(const std::shared_ptr<const datafacade::BaseDat
         return Error("InvalidValue", "Invalid coordinate value.", json_result);
     }
 
-    if (parameters.source >= static_cast<int>(parameters.coordinates.size()) ||
-        parameters.destination >= static_cast<int>(parameters.coordinates.size()))
-    {
-        return Error("InvalidInputs",
-                     "Source or destination indices are greater number of coordinates provided.",
-                     json_result);
-    }
-
     auto phantom_node_pairs = GetPhantomNodes(*facade, parameters);
     if (phantom_node_pairs.size() != parameters.coordinates.size())
     {
@@ -301,7 +293,6 @@ Status TripPlugin::HandleRequest(const std::shared_ptr<const datafacade::BaseDat
             {
                 scc_route = trip::BruteForceTrip(
                     route_begin, route_end, number_of_locations, result_table);
-
             }
             else
             {

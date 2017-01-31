@@ -35,7 +35,6 @@ module.exports = function () {
 
                     if (headers.has('status')) {
                         got.status = json.code;
-
                     }
 
                     if (headers.has('message')) {
@@ -49,15 +48,6 @@ module.exports = function () {
                             got.geometry = polyline.decode(json.trips[0].geometry, 6).toString();
                         } else {
                             got.geometry = json.trips[0].geometry.coordinates;
-                        }
-                    }
-
-                    if (headers.has('source') && headers.has('destination')) {
-                        if (this.queryParams['source']) {
-                            got.source = json.trips[0].source;
-                        }
-                        if (this.queryParams['destination']) {
-                            got.destination = json.trips[0].destination;
                         }
                     }
 
@@ -160,6 +150,12 @@ module.exports = function () {
                             waypoints.push(node);
                         });
                         got = { waypoints: row.waypoints };
+
+                        if (row.source && row.destination) {
+                            params.source = got.source = row.source;
+                            params.destination = got.destination = row.destination;
+                        } 
+
                         this.requestTrip(waypoints, params, afterRequest);
                     } else {
                         throw new Error('*** no waypoints');

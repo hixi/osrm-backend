@@ -311,7 +311,7 @@ All other properties might be undefined.
 
 ### Trip service
 
-The trip plugin solves the Traveling Salesman Problem using a greedy heuristic (farthest-insertion algorithm) for more than ten nodes and uses brute force for 10 nodes or less.
+The trip plugin solves the Traveling Salesman Problem using a greedy heuristic (farthest-insertion algorithm) for 10 or more waypoints and uses brute force for less than 10 waypoints.
 The returned path does not have to be the fastest path, as TSP is NP-hard it is only an approximation.
 Note that if the input coordinates can not be joined by a single trip (e.g. the coordinates are on several disconnected islands)
 multiple trips for each connected component are returned.
@@ -330,11 +330,11 @@ In addition to the [general options](#general-options) the following options are
 |overview    |`simplified` (default), `full`, `false`         |Add overview geometry either full, simplified according to highest zoom level it could be display on, or not at all.|
 
 A second feature of the trip plugin returns the route from a source to a destination while visiting all the other waypoints in the middle. 
-As with the roundtrip service, for fewer than 10 waypoints, the brute force algorithm is used, while for more than 10 waypoints the farthest insertion heuristic is used.
+As with the roundtrip service, for fewer than 10 waypoints, the brute force algorithm is used, while for 10 or more waypoints the farthest insertion heuristic is used.
 
 |Option      |Values                                          |Description                                                                                                                              |
 |------------|------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-|source      |`{index of coordinate in coordinates provided}` |Will error if destionation is not provided as well. Returns trip from source to destination routing through all other locations provided.|
+|source      |`{index of coordinate in coordinates provided}` |Will error if destination is not provided as well. Returns trip from source to destination routing through all other locations provided.|
 |destination |`{index of coordinate in coordinates provided}` |Will error if source is not provided as well. Returns trip from source to destination routing through all other locations provided.      |
 
 

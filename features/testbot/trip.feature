@@ -5,7 +5,7 @@ Feature: Basic trip planning
         Given the profile "testbot"
         Given a grid size of 10 meters
 
-    Scenario: Testbot - Trip planning with less than 10 nodes
+    Scenario: Testbot - Trip planning with less than 10 waypoints
         Given the node map
             """
             a b
@@ -24,7 +24,7 @@ Feature: Basic trip planning
             | a,b,c,d   | abcda  | 7.6       |
             | d,b,c,a   | dbcad  | 7.6       |
 
-    Scenario: Testbot - Trip planning with more than 10 nodes
+    Scenario: Testbot - Trip planning with more than 10 waypoints
         Given the node map
             """
             a b c d
@@ -52,11 +52,7 @@ Feature: Basic trip planning
             | a,b,c,d,e,f,g,h,i,j,k,l | cbalkjihgfedc |
 
 
-    Scenario: Testbot - Trip planning with less than ten node tfse
-        Given the query options
-            | source        | 0       |
-            | destination   | 2       |
-
+    Scenario: Testbot - Trip planning with less than 10 waypoints tfse
         Given the node map
             """
             a  b
@@ -79,15 +75,11 @@ Feature: Basic trip planning
             | de    |
  
          When I plan a trip I should get
-            |  waypoints  | trips  | durations         | distance |
-            |  a,b,c,d,e  | abedc  | 8.200000000000001 | 81.6     |
+            |  waypoints  | source | destination | trips  | durations         | distance |
+            |  a,b,c,d,e  | 0      | 2           | abedc  | 8.200000000000001 | 81.6     |
 
 
     Scenario: Testbot - Trip planning with more than 10 nodes tfse
-        Given the query options
-            | source        | 0       |
-            | destination   | 10      |
-
         Given the node map
             """
             a b c d e f g h i j k
@@ -107,49 +99,9 @@ Feature: Basic trip planning
             | jk    |
 
         When I plan a trip I should get
-            |  waypoints              | trips       | durations  | distance  |
-            |  a,b,c,d,e,f,g,h,i,j,k  | abcdefghijk | 10         | 99.9      |
-
-
-    Scenario: Testbot - Trip planning with illegal destination
-        Given the query options
-            | source        | 2       |
-            | destination   | 10      |
-
-        Given the node map
-            """
-            a b c
-            """
-
-        And the ways
-            | nodes |
-            | ab    |
-            | bc    |
-
-        When I plan a trip I should get
-            |  waypoints  | status        | message                                                                                  |
-            |  a,b,c      | InvalidInputs | Source or destination indices are greater number of coordinates provided. |
-
-
-    Scenario: Testbot - Trip planning with illegal source
-        Given the query options
-            | source        | 10     |
-            | destination   | 2      |
-
-        Given the node map
-            """
-            a b c
-            """
-
-        And the ways
-            | nodes |
-            | ab    |
-            | bc    |
-
-        When I plan a trip I should get
-            |  waypoints  | status        | message                                                                                  |
-            |  a,b,c      | InvalidInputs | Source or destination indices are greater number of coordinates provided. |
-
+            |  waypoints              | source | destination | trips       | durations  | distance  |
+            |  a,b,c,d,e,f,g,h,i,j,k  | 0      | 10          | abcdefghijk | 10         | 99.9      |
+            |  a,b,c,d,e              | 0      | 4           | abcde       | 4          | 40        |
 
     # Test single node in each component #1850
     Scenario: Testbot - Trip planning with less than 10 nodes
@@ -208,10 +160,6 @@ Feature: Basic trip planning
 
 
     Scenario: Testbot - Trip planning with multiple scc tfse
-        Given the query options
-            | source        | 0       |
-            | destination   | 3       |
-
         Given the node map
             """
             a b
@@ -225,8 +173,10 @@ Feature: Basic trip planning
             | dc    |
 
          When I plan a trip I should get
-            |  waypoints    | status   | message                                          |
-            |  a,b,c,d      | NoTrips  | There's no way to get from source to destination |
+            |  waypoints    | source  | destination | status       | message                                          |
+            |  a,b,c,d      | 0       | 3           | NoTrips      | There's no way to get from source to destination |
+            |  a,b,c,d      | -1      | 1           | InvalidQuery | Query string malformed close to position 123     |
+            |  a,b,c,d      | 1       | -1          | InvalidQuery | Query string malformed close to position 137     |
 
 
     Scenario: Testbot - Repeated Coordinate
