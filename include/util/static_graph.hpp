@@ -52,7 +52,6 @@ template <> struct SortableEdgeWithData<void>
     NodeIterator source;
     NodeIterator target;
 
-    template <typename... Ts>
     SortableEdgeWithData(NodeIterator source, NodeIterator target) : source(source), target(target)
     {
     }

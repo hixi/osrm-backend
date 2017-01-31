@@ -28,8 +28,14 @@ namespace osrm
 namespace tools
 {
 
+struct TarjanEdgeData
+{
+    EdgeWeight weight;
+    NameID name;
+};
+
 using TarjanGraph = util::StaticGraph<void>;
-using TarjanEdge = util::static_graph_details::SortableEdgeWithData<void>;
+using TarjanEdge = util::static_graph_details::SortableEdgeWithData<TarjanEdgeData>;
 
 std::size_t loadGraph(const std::string &path,
                       std::vector<extractor::QueryNode> &coordinate_list,
