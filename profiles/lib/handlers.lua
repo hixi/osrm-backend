@@ -192,6 +192,13 @@ function Handlers.handle_access(way,result,data,profile)
   data.forward_access, data.backward_access =
     Tags.get_forward_backward_by_set(way,data,profile.access_tags_hierarchy)
 
+  -- allow access if undefined in one direction but defined in opposite one
+  if data.forward_access and not data.backward_access then
+     data.backward_access = 'yes'
+  elseif data.backward_access and not data.forward_access then
+     data.forward_access = 'yes'
+  end
+
   if profile.access_tag_blacklist[data.forward_access] then
     result.forward_mode = mode.inaccessible
   end
@@ -223,10 +230,14 @@ function Handlers.handle_speed(way,result,data,profile)
     -- Set the avg speed on ways that are marked accessible
     if profile.access_tag_whitelist[data.forward_access] then
       result.forward_speed = profile.default_speed
+    elseif data.forward_access and not profile.access_tag_blacklist[data.forward_access] then
+      result.forward_speed = profile.default_speed -- fallback to the avg speed if access tag is not blacklisted
     end
 
     if profile.access_tag_whitelist[data.backward_access] then
       result.backward_speed = profile.default_speed
+    elseif data.backward_access and not profile.access_tag_blacklist[data.backward_access] then
+      result.backward_speed = profile.default_speed -- fallback to the avg speed if access tag is not blacklisted
     end
   end
 

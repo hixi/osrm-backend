@@ -245,3 +245,15 @@ Feature: Car - Restricted access
             | gate         | designated | x     |
             | gate         | private    |       |
             | gate         | garbagetag | x     |
+
+    Scenario: Car - a way with conditional access
+        Then routability should be
+            | highway    | vehicle:forward | vehicle:backward:conditional | forw | backw |
+            | pedestrian | yes             | delivery @ (20:00-11:00)     | x    | x     |
+
+    Scenario: Car - a way with a list of tags
+        Then routability should be
+            | highway | motor_vehicle            | motor_vehicle:forward | motor_vehicle:backward | forw | backw |
+            | footway |                          |                       | destination            | x    | x     |
+            | track   | destination;agricultural | destination           |                        | x    | x     |
+
