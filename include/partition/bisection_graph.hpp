@@ -34,11 +34,6 @@ struct BisectionEdge
 {
     // StaticGraph Edge requirement (see static graph traits): .target, .data
     NodeID target;
-
-    // TODO: add data for augmentation here. In case we want to keep it completely external, the
-    // static graph can be modified to no longer require a .data member by SFINAE-ing out features
-    // based on the available compile time traits.
-    std::int32_t data;
 };
 
 // The graph layout we use as a basis for partitioning.
@@ -93,7 +88,7 @@ std::vector<BisectionEdge> adaptToBisectionEdge(std::vector<InputEdge> edges)
     std::vector<BisectionEdge> result(edges.size());
 
     std::transform(begin(edges), end(edges), begin(result), [](const auto &edge) {
-        return BisectionEdge{edge.target, 1};
+        return BisectionEdge{edge.target};
     });
 
     return result;
