@@ -31,17 +31,19 @@ EdgeWeight ReturnDistance(const util::DistTableWrapper<EdgeWeight> &dist_table,
     std::size_t i = 0;
     while (i < location_order.size() && (route_dist < min_route_dist))
     {
-        // Check for path that touches INVALID_EDGE_WEIGHT (which is MAX_32INT)
-        // Fixed start and end trip needs to escape this path if a max edge weight is found on the
-        // dist table
-        if (dist_table(location_order[i], location_order[(i + 1) % component_size]) ==
-            INVALID_EDGE_WEIGHT)
+
+        auto edge_weight = dist_table(location_order[i], location_order[(i + 1) % component_size]);
+
+        // If the edge_weight is very large (INVALID_EDGE_WEIGHT) then the algorithm will not choose
+        // this edge in final minimal path. So instead of computing all the permutations after this
+        // large edge, discard this edge right here and don't consider the path after this edge.
+        if (edge_weight == INVALID_EDGE_WEIGHT)
         {
             return INVALID_EDGE_WEIGHT;
         }
         else
         {
-            route_dist += dist_table(location_order[i], location_order[(i + 1) % component_size]);
+            route_dist += edge_weight;
         }
 
         // This boost assert should not be reached if TFSE table

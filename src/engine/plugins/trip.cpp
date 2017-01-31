@@ -204,35 +204,37 @@ Status TripPlugin::HandleRequest(const std::shared_ptr<const datafacade::BaseDat
                      "Distance Table has wrong size");
 
     // The following code manipulates the table and produces the new table for
-    // Trip with Fixed Start and End (TFSE)
+    // Trip with Fixed Start and End (TFSE). In the example the source is a
+    // and destination is c. The new table forces the algorithms to not choose
+    // the edges that go to the source and never to flow out of the destination
+    // in the "optimal" path. This way the brute force and the farthest insertion
+    // algorithms don't have to be modified, and instead we can just pass a
+    // modified table to return a non-roundtrip "optimal" route from a start node
+    // to an end node.
 
-    // Original Table
-    //   a  b  c  d  e
-    // a 0  15 36 34 30
-    // b 15 0  25 30 34
-    // c 36 25 0  18 32
-    // d 34 30 18 0  15
-    // e 30 34 32 15 0
-
-    // New Table
-    //   a        b         c        d         e
-    // a 0        15        10000    34        30
-    // b 10000    0         25       30        34
-    // c 0        10000     0        10000     10000
-    // d 10000    30        18       0         15
-    // e 10000    34        32       15        0
+    // Original Table           // New Table
+    //   a  b  c  d  e          //   a        b         c        d         e
+    // a 0  15 36 34 30         // a 0        15        10000    34        30
+    // b 15 0  25 30 34         // b 10000    0         25       30        34
+    // c 36 25 0  18 32         // c 0        10000     0        10000     10000
+    // d 34 30 18 0  15         // d 10000    30        18       0         15
+    // e 30 34 32 15 0          // e 10000    34        32       15        0
 
     if (parameters.source > -1 && parameters.destination > -1)
     {
         // parameters.source column
-        for (NodeID i = 0; i < result_table.GetNumberOfNodes(); i++) {
-            if (i == (NodeID)parameters.source) continue;
+        for (NodeID i = 0; i < result_table.GetNumberOfNodes(); i++)
+        {
+            if (i == (NodeID)parameters.source)
+                continue;
             result_table.InvalidateRoute(i, (NodeID)parameters.source);
         }
 
         // parameters.destination row
-        for (NodeID i = 0; i <result_table.GetNumberOfNodes(); i++) {
-            if (i == (NodeID)parameters.destination) continue;
+        for (NodeID i = 0; i < result_table.GetNumberOfNodes(); i++)
+        {
+            if (i == (NodeID)parameters.destination)
+                continue;
             result_table.ShortcutRoute((NodeID)parameters.destination, i);
         }
 
@@ -291,8 +293,8 @@ Status TripPlugin::HandleRequest(const std::shared_ptr<const datafacade::BaseDat
         {
             if (component_size < BF_MAX_FEASABLE)
             {
-                scc_route = trip::BruteForceTrip(
-                    route_begin, route_end, number_of_locations, result_table);
+                scc_route =
+                    trip::BruteForceTrip(route_begin, route_end, number_of_locations, result_table);
             }
             else
             {

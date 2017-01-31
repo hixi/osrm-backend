@@ -50,6 +50,9 @@ GetShortestRoundTrip(const NodeID new_loc,
         const auto dist_to = dist_table(new_loc, *to_node);
         const auto trip_dist = dist_from + dist_to - dist_table(*from_node, *to_node);
 
+        // If the edge_weight is very large (INVALID_EDGE_WEIGHT) then the algorithm will not choose
+        // this edge in final minimal path. So instead of computing all the permutations after this
+        // large edge, discard this edge right here and don't consider the path after this edge.
         if (dist_from == INVALID_EDGE_WEIGHT || dist_to == INVALID_EDGE_WEIGHT)
             continue;
         // This is not neccessarily true:
