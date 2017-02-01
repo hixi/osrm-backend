@@ -107,4 +107,4 @@ Feature: Foot - Access tags on ways
     Scenario: Foot - a way with missing ":forward" tag
         Then routability should be
             | highway  | bicycle:backward | foot:backward | forw | backw |
-            | cycleway | designated       | designated    | x    | x     |
+            | cycleway | designated       | designated    |      | x     |

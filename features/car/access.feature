@@ -50,14 +50,14 @@ Feature: Car - Restricted access
             | no     |                | yes             |          |                  |                   |      | x     |
             | no     |                | no              | yes      |                  |                   | x    | x     |
             | no     |                | no              | no       |                  | yes               |      | x     |
-            |        | no             |                 |          | no               |                   |      | x     |
-            |        |                | no              |          |                  | no                | x    |       |
+            |        | no             |                 |          | no               |                   |      |       |
+            |        |                | no              |          |                  | no                |      |       |
             |        | no             |                 |          |                  | no                |      |       |
             |        |                | no              | no       |                  |                   |      |       |
-            |        | no             |                 |          | yes              |                   | x    | x     |
-            |        |                | no              |          |                  | yes               | x    | x     |
-            |        | yes            |                 |          | no               |                   |      | x     |
-            |        |                | yes             |          |                  | no                | x    |       |
+            |        | no             |                 |          | yes              |                   | x    |       |
+            |        |                | no              |          |                  | yes               |      | x     |
+            |        | yes            |                 |          | no               |                   |      |       |
+            |        |                | yes             |          |                  | no                |      |       |
 
     Scenario: Car - Access tag hierarchy on nodes
         Then routability should be
@@ -249,11 +249,11 @@ Feature: Car - Restricted access
     Scenario: Car - a way with conditional access
         Then routability should be
             | highway    | vehicle:forward | vehicle:backward:conditional | forw | backw |
-            | pedestrian | yes             | delivery @ (20:00-11:00)     | x    | x     |
+            | pedestrian | yes             | delivery @ (20:00-11:00)     | x    |       |
 
     Scenario: Car - a way with a list of tags
         Then routability should be
             | highway | motor_vehicle            | motor_vehicle:forward | motor_vehicle:backward | forw | backw |
-            | footway |                          |                       | destination            | x    | x     |
+            | footway |                          |                       | destination            |      | x     |
             | track   | destination;agricultural | destination           |                        | x    | x     |
 
