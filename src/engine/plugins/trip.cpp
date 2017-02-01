@@ -144,11 +144,12 @@ TripPlugin::ComputeRoute(const std::shared_ptr<const datafacade::BaseDataFacade>
 
     if (roundtrip)
     {
+        // trip comes out to be something like 0 1 4 3 2 0
         BOOST_ASSERT(min_route.segment_end_coordinates.size() == trip.size());
     }
     else
     {
-        // trip comes out to be something like 0 1 4 3 2, so the sizes don't
+        // trip comes out to be something like 0 1 4 3 2, so the sizes don't match
         BOOST_ASSERT(min_route.segment_end_coordinates.size() == trip.size() - 1);
     }
 
@@ -186,6 +187,12 @@ Status TripPlugin::HandleRequest(const std::shared_ptr<const datafacade::BaseDat
     }
     BOOST_ASSERT(phantom_node_pairs.size() == parameters.coordinates.size());
 
+    bool roundtrip = true;
+    if (parameters.source > -1 && parameters.destination > -1)
+    {
+        roundtrip = false;
+    }
+
     auto snapped_phantoms = SnapPhantomNodes(phantom_node_pairs);
 
     const auto number_of_locations = snapped_phantoms.size();
@@ -220,7 +227,7 @@ Status TripPlugin::HandleRequest(const std::shared_ptr<const datafacade::BaseDat
     // d 34 30 18 0  15         // d 10000    30        18       0         15
     // e 30 34 32 15 0          // e 10000    34        32       15        0
 
-    if (parameters.source > -1 && parameters.destination > -1)
+    if (!roundtrip)
     {
         // parameters.source column
         for (NodeID i = 0; i < result_table.GetNumberOfNodes(); i++)
@@ -245,7 +252,7 @@ Status TripPlugin::HandleRequest(const std::shared_ptr<const datafacade::BaseDat
     // get scc components
     SCC_Component scc = SplitUnaccessibleLocations(result_table.GetNumberOfNodes(), result_table);
 
-    if (parameters.source > -1 && parameters.destination > -1) // check if fixed start and end
+    if (!roundtrip)
     {
         // if source and destination are in different sccs then return error
         if (scc.GetNumberOfComponents() > 1)
@@ -317,11 +324,6 @@ Status TripPlugin::HandleRequest(const std::shared_ptr<const datafacade::BaseDat
     // compute all round trip routes
     std::vector<InternalRouteResult> routes;
     routes.reserve(trips.size());
-    bool roundtrip = true;
-    if (parameters.source > -1 && parameters.destination > -1)
-    {
-        roundtrip = false;
-    }
     for (const auto &trip : trips)
     {
         routes.push_back(ComputeRoute(facade, snapped_phantoms, trip, roundtrip));

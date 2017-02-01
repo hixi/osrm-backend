@@ -28,7 +28,7 @@
     - Tools:
       - Added osrm-extract-conditionals tool for checking conditional values in OSM data
     - Trip Plugin
-      - Added a new feature that finds the optimal route given a list of location, a start and destination locations. This does not return a roundtrip, but instead gives the optimal route given fixed start and end points
+      - Added a new feature that finds the optimal route given a list of waypoints, and a source and a destination. This does not return a roundtrip, but instead gives the optimal route given the fixed source and destination points.
 
 # 5.5.1
   - Changes from 5.5.0
