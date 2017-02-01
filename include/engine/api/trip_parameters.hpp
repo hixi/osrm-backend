@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "engine/api/route_parameters.hpp"
 
+#include <boost/optional.hpp>
 #include <vector>
 
 namespace osrm
@@ -50,15 +51,20 @@ struct TripParameters : public RouteParameters
     TripParameters() = default;
 
     template <typename... Args>
-    TripParameters(int source_, int destination_, Args &&... args_)
+    TripParameters(std::size_t source_, std::size_t destination_, Args &&... args_)
         : RouteParameters{std::forward<Args>(args_)...}, source{source_}, destination{destination_}
     {
     }
 
-    int source = -1;
-    int destination = -1;
+    boost::optional<std::size_t> source;
+    boost::optional<std::size_t> destination;
 
-    bool IsValid() const { return RouteParameters::IsValid() && source >= -1 && destination >= -1; }
+    bool IsValid() const
+    {
+        return ((!source && !destination) ||
+                (source && *source < coordinates.size() && *destination < coordinates.size())) &&
+               RouteParameters::IsValid();
+    }
 };
 }
 }

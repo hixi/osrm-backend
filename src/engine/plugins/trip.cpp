@@ -188,7 +188,7 @@ Status TripPlugin::HandleRequest(const std::shared_ptr<const datafacade::BaseDat
     BOOST_ASSERT(phantom_node_pairs.size() == parameters.coordinates.size());
 
     bool roundtrip = true;
-    if (parameters.source > -1 && parameters.destination > -1)
+    if (parameters.source && parameters.destination)
     {
         roundtrip = false;
     }
@@ -212,12 +212,11 @@ Status TripPlugin::HandleRequest(const std::shared_ptr<const datafacade::BaseDat
 
     // The following code manipulates the table and produces the new table for
     // Trip with Fixed Start and End (TFSE). In the example the source is a
-    // and destination is c. The new table forces the algorithms to not choose
-    // the edges that go to the source and never to flow out of the destination
-    // in the "optimal" path. This way the brute force and the farthest insertion
-    // algorithms don't have to be modified, and instead we can just pass a
-    // modified table to return a non-roundtrip "optimal" route from a start node
-    // to an end node.
+    // and destination is c. The new table forces the roundtrip to start at
+    // source and end at destination by virtually squashing them together.
+    // This way the brute force and the farthest insertion algorithms don't
+    // have to be modified, and instead we can just pass a modified table to
+    // return a non-roundtrip "optimal" route from a start node to an end node.
 
     // Original Table           // New Table
     //   a  b  c  d  e          //   a        b         c        d         e
@@ -230,23 +229,32 @@ Status TripPlugin::HandleRequest(const std::shared_ptr<const datafacade::BaseDat
     if (!roundtrip)
     {
         // parameters.source column
+        // set any node to source to impossibly high numbers so it will never
+        // try to use any node->source in the middle of the "optimal path"
         for (NodeID i = 0; i < result_table.GetNumberOfNodes(); i++)
         {
-            if (i == (NodeID)parameters.source)
+            if (i == (NodeID)*parameters.source)
                 continue;
-            result_table.InvalidateRoute(i, (NodeID)parameters.source);
+            result_table.InvalidateRoute(i, *parameters.source);
         }
 
         // parameters.destination row
+        // set destination to anywhere else to impossibly high numbers so it will
+        // never try to use destination->any node in the middle of the "optimal path"
         for (NodeID i = 0; i < result_table.GetNumberOfNodes(); i++)
         {
-            if (i == (NodeID)parameters.destination)
+            if (i == (NodeID)*parameters.destination)
                 continue;
-            result_table.ShortcutRoute((NodeID)parameters.destination, i);
+            result_table.ShortcutRoute(*parameters.destination, i);
         }
 
-        result_table.ShortcutRoute(parameters.destination, parameters.source);
-        result_table.InvalidateRoute(parameters.source, parameters.destination);
+        // set destination->source to zero so rountrip treats source and
+        // destination as one location
+        result_table.ShortcutRoute(*parameters.destination, *parameters.source);
+
+        // set source->destination as very high number so algorithm is forced
+        // to find another path to get to destination
+        result_table.InvalidateRoute(*parameters.source, *parameters.destination);
     }
 
     // get scc components
@@ -266,9 +274,9 @@ Status TripPlugin::HandleRequest(const std::shared_ptr<const datafacade::BaseDat
                 auto route_end = std::begin(scc.component) + scc.range[k + 1];
 
                 std::for_each(route_begin, route_end, [&](const NodeID &id) {
-                    if ((NodeID)parameters.source == id)
+                    if ((NodeID)*parameters.source == id)
                         source_component_id = k;
-                    if ((NodeID)parameters.destination == id)
+                    if ((NodeID)*parameters.destination == id)
                         destination_component_id = k;
                 });
             }
